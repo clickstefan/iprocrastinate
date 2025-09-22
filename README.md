@@ -4,7 +4,9 @@ A modern web app to help overcome procrastination and boost productivity.
 
 ## 🚀 Live Demo
 
-Visit the web app at: **http://localhost:8080** (when running locally)
+**Live App**: https://clickstefan.github.io/iprocrastinate
+
+**Local Development**: http://localhost:8080 (when running locally)
 
 ## 🛠️ Getting Started
 
