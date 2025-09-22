@@ -37,23 +37,29 @@ void main() {
       test('has required manifest fields for TWA', () {
         // Required fields for TWA
         expect(manifest['name'], isNotNull, reason: 'name is required');
-        expect(manifest['short_name'], isNotNull, reason: 'short_name is required');
-        expect(manifest['start_url'], isNotNull, reason: 'start_url is required');
+        expect(manifest['short_name'], isNotNull,
+            reason: 'short_name is required');
+        expect(manifest['start_url'], isNotNull,
+            reason: 'start_url is required');
         expect(manifest['display'], isNotNull, reason: 'display is required');
-        expect(manifest['theme_color'], isNotNull, reason: 'theme_color is required');
-        expect(manifest['background_color'], isNotNull, reason: 'background_color is required');
+        expect(manifest['theme_color'], isNotNull,
+            reason: 'theme_color is required');
+        expect(manifest['background_color'], isNotNull,
+            reason: 'background_color is required');
       });
 
       test('display mode is suitable for TWA', () {
         final display = manifest['display'];
         final validDisplayModes = ['standalone', 'fullscreen', 'minimal-ui'];
         expect(validDisplayModes.contains(display), isTrue,
-            reason: 'display must be standalone, fullscreen, or minimal-ui for TWA');
+            reason:
+                'display must be standalone, fullscreen, or minimal-ui for TWA');
       });
 
       test('has valid icons for TWA', () {
         expect(manifest['icons'], isNotNull, reason: 'icons array is required');
-        expect(manifest['icons'], isA<List>(), reason: 'icons must be an array');
+        expect(manifest['icons'], isA<List>(),
+            reason: 'icons must be an array');
 
         final icons = manifest['icons'] as List;
         expect(icons.isNotEmpty, isTrue, reason: 'must have at least one icon');
@@ -67,7 +73,8 @@ void main() {
       test('start_url is relative for TWA compatibility', () {
         final startUrl = manifest['start_url'] as String;
         expect(startUrl.startsWith('/') || startUrl == './' || startUrl == '.',
-            isTrue, reason: 'start_url should be relative for TWA');
+            isTrue,
+            reason: 'start_url should be relative for TWA');
         expect(startUrl.startsWith('http'), isFalse,
             reason: 'start_url should not be absolute URL for TWA');
       });
@@ -122,7 +129,8 @@ void main() {
         for (final pattern in externalLinkPatterns) {
           final regex = RegExp(pattern);
           expect(regex.hasMatch(indexHtml), isFalse,
-              reason: 'External navigation detected: $pattern. This may not work in TWA.');
+              reason:
+                  'External navigation detected: $pattern. This may not work in TWA.');
         }
       });
     });
@@ -158,7 +166,8 @@ void main() {
 
         for (final pattern in cdnPatterns) {
           expect(indexHtml.contains(pattern), isFalse,
-              reason: 'External CDN dependency detected: $pattern. Use local files for TWA.');
+              reason:
+                  'External CDN dependency detected: $pattern. Use local files for TWA.');
         }
       });
     });
@@ -204,7 +213,8 @@ void main() {
           final size = await jsFile.length();
           // Dart compiled JS should be under 500KB for good TWA performance
           expect(size, lessThan(500 * 1024),
-              reason: 'JavaScript bundle should be under 500KB for optimal TWA performance');
+              reason:
+                  'JavaScript bundle should be under 500KB for optimal TWA performance');
         }
       });
 

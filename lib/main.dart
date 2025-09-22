@@ -37,7 +37,8 @@ class iProcrastinateApp {
     taskInput = html.querySelector('#taskInput') as html.InputElement;
     taskList = html.querySelector('#taskList')!;
     addTaskBtn = html.querySelector('#addTaskBtn') as html.ButtonElement;
-    completeTaskBtn = html.querySelector('#completeTaskBtn') as html.ButtonElement;
+    completeTaskBtn =
+        html.querySelector('#completeTaskBtn') as html.ButtonElement;
     clearAllBtn = html.querySelector('#clearAllBtn') as html.ButtonElement;
 
     // Set up event listeners
@@ -46,7 +47,8 @@ class iProcrastinateApp {
     clearAllBtn.onClick.listen((_) => clearAllTasks());
 
     taskInput.onKeyPress.listen((event) {
-      if (event.keyCode == 13) { // Enter key
+      if (event.keyCode == 13) {
+        // Enter key
         addTask();
       }
     });
@@ -75,7 +77,8 @@ class iProcrastinateApp {
   }
 
   void completeSelectedTask() {
-    final selectedTask = tasks.where((task) => task.isSelected && !task.isCompleted).firstOrNull;
+    final selectedTask =
+        tasks.where((task) => task.isSelected && !task.isCompleted).firstOrNull;
     if (selectedTask != null) {
       selectedTask.isCompleted = true;
       selectedTask.isSelected = false;
@@ -122,7 +125,8 @@ class iProcrastinateApp {
     } else {
       for (var task in tasks.reversed) {
         final taskElement = html.LIElement()
-          ..className = 'task-item ${task.isSelected ? 'selected' : ''} ${task.isCompleted ? 'completed' : ''}'
+          ..className =
+              'task-item ${task.isSelected ? 'selected' : ''} ${task.isCompleted ? 'completed' : ''}'
           ..onClick.listen((_) => selectTask(task.id));
 
         final taskText = html.SpanElement()
@@ -139,7 +143,8 @@ class iProcrastinateApp {
     }
 
     // Update button states
-    final hasSelectedTask = tasks.any((task) => task.isSelected && !task.isCompleted);
+    final hasSelectedTask =
+        tasks.any((task) => task.isSelected && !task.isCompleted);
     completeTaskBtn.disabled = !hasSelectedTask;
   }
 
@@ -160,20 +165,24 @@ class iProcrastinateApp {
 
   void saveToStorage() {
     // Save to localStorage
-    final taskData = tasks.map((task) => {
-      'id': task.id,
-      'text': task.text,
-      'createdAt': task.createdAt.millisecondsSinceEpoch,
-      'isCompleted': task.isCompleted,
-    }).toList();
+    final taskData = tasks
+        .map((task) => {
+              'id': task.id,
+              'text': task.text,
+              'createdAt': task.createdAt.millisecondsSinceEpoch,
+              'isCompleted': task.isCompleted,
+            })
+        .toList();
 
     html.window.localStorage['iprocrastinate_tasks'] = taskData.toString();
-    html.window.localStorage['iprocrastinate_completed_count'] = completedCount.toString();
+    html.window.localStorage['iprocrastinate_completed_count'] =
+        completedCount.toString();
   }
 
   void loadFromStorage() {
     try {
-      final completedCountStr = html.window.localStorage['iprocrastinate_completed_count'];
+      final completedCountStr =
+          html.window.localStorage['iprocrastinate_completed_count'];
       if (completedCountStr != null) {
         completedCount = int.tryParse(completedCountStr) ?? 0;
       }
