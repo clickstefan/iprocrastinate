@@ -43,17 +43,59 @@ A modern web app to help overcome procrastination and boost productivity.
 
 ## 🧪 Testing & CI/CD
 
-### Local Testing
-```bash
-# Run TWA compatibility tests
-dart test test/twa_compatibility_test.dart
+### Local Testing & Validation
 
-# Run complete compatibility check
+#### **🚀 Quick Commands (catch 90% of CI issues)**
+```bash
+./scripts/quick_check.sh           # ⚡ 10-second essential checks
+./scripts/pre_commit_check.sh      # 🔍 Comprehensive validation
+./scripts/simulate_ci.sh           # 🤖 Complete CI simulation
+```
+
+#### **📋 Individual Checks**
+```bash
+# Code quality
+dart format .                      # Fix formatting
+dart analyze                       # Static analysis
+dart test                          # Run all tests
+
+# TWA compatibility
+dart test test/twa_compatibility_test.dart
 ./scripts/check_twa_compatibility.sh
 
-# Format and analyze code
-dart format .
-dart analyze
+# Build validation
+dart compile js lib/main.dart -o docs/main.dart.js
+```
+
+#### **🔧 Git Hooks (Automatic Validation)**
+```bash
+./scripts/setup_git_hooks.sh       # Install pre-commit validation
+
+# What gets installed:
+# • pre-commit: Runs validation before each commit
+# • pre-push: Simulates CI before pushing
+# • commit-msg: Validates commit message format
+```
+
+#### **💡 Workflow Recommendations**
+
+**Before committing:**
+```bash
+./scripts/quick_check.sh           # Fast check (10s)
+# If issues found:
+dart format .                      # Fix most common issues
+./scripts/pre_commit_check.sh      # Comprehensive check
+```
+
+**Before pushing:**
+```bash
+./scripts/simulate_ci.sh           # Full CI simulation (30s)
+# Catches: formatting, analysis, tests, TWA, build, performance
+```
+
+**Setup once:**
+```bash
+./scripts/setup_git_hooks.sh       # Auto-validation on commit/push
 ```
 
 ### GitHub Actions Workflow
