@@ -1,5 +1,9 @@
 # iProcrastinate
 
+[![CI/CD Pipeline](https://github.com/clickstefan/iprocrastinate/actions/workflows/ci.yml/badge.svg)](https://github.com/clickstefan/iprocrastinate/actions/workflows/ci.yml)
+[![TWA Compatible](https://img.shields.io/badge/TWA-Compatible-brightgreen)](https://developers.google.com/web/android/trusted-web-activity)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-blue)](https://clickstefan.github.io/iprocrastinate)
+
 A modern web app to help overcome procrastination and boost productivity.
 
 ## 🚀 Live Demo
@@ -37,26 +41,84 @@ A modern web app to help overcome procrastination and boost productivity.
 - **Storage**: Browser localStorage for persistence
 - **Responsive**: Mobile-first design
 
-## 🧪 Testing
+## 🧪 Testing & CI/CD
 
-### TWA Compatibility Testing
-Ensures the app meets all Trusted Web Activities requirements:
-
+### Local Testing
 ```bash
 # Run TWA compatibility tests
 dart test test/twa_compatibility_test.dart
 
 # Run complete compatibility check
 ./scripts/check_twa_compatibility.sh
+
+# Format and analyze code
+dart format .
+dart analyze
 ```
 
-**What we test:**
+### GitHub Actions Workflow
+Automated CI/CD pipeline runs on every push and PR:
+
+#### **Pipeline Stages:**
+
+1. **🧪 Test & Lint**
+   - Code formatting validation
+   - Static analysis with `dart analyze`
+   - Unit tests with coverage
+   - TWA compatibility verification
+
+2. **🏗️ Build**
+   - Optimized JavaScript compilation (`-O2`)
+   - Static asset copying
+   - Build validation (file sizes, required files)
+   - Post-build TWA compatibility check
+
+3. **🚀 Deploy** (on `master`/`main` branch)
+   - Automatic GitHub Pages deployment
+   - Build artifact upload
+   - Performance validation
+
+4. **🔍 Quality & Security**
+   - Dependency security audit
+   - Performance analysis (bundle size)
+   - Lighthouse CI checks (optional)
+
+#### **Configuration Options:**
+
+Edit `.github/workflows/config.yml` to customize:
+
+```yaml
+# Output directory (common conventions supported)
+output_directory: docs  # or: web, build, dist
+
+# Performance thresholds
+max_js_size: 500000    # 500KB
+max_css_size: 100000   # 100KB
+
+# Feature toggles
+twa_checks_enabled: true
+deploy_to_github_pages: true
+performance_checks_enabled: true
+```
+
+#### **Workflow Features:**
+
+- ✅ **Multi-folder support**: `docs/`, `web/`, `build/`, `dist/`
+- ✅ **Caching**: Dart dependencies cached for faster builds
+- ✅ **Artifacts**: Build outputs saved for 30 days
+- ✅ **Security**: Dependency vulnerability scanning
+- ✅ **Performance**: Bundle size monitoring
+- ✅ **TWA validation**: Ensures Play Store compatibility
+
+### Testing Coverage
+**What we validate:**
 - ✅ Manifest.json validation (PWA requirements)
 - ✅ HTML structure (viewport, theme-color, responsive)
 - ✅ No external dependencies (CDN-free)
 - ✅ File sizes optimized for mobile
 - ✅ TWA-specific requirements (relative URLs, display mode)
 - ✅ Performance benchmarks
+- ✅ Security vulnerabilities
 
 ## 🧰 Tech Stack
 

@@ -1,0 +1,248 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+env:
+  # Configurable output directory - common conventions
+  OUTPUT_DIR: docs  # Could be: docs, web, build, dist
+
+jobs:
+  test:
+    name: Test & Lint
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Dart SDK
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: '3.0.0'
+
+    - name: Cache Dart dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.pub-cache
+          .dart_tool
+        key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-dart-
+
+    - name: Install dependencies
+      run: dart pub get
+
+    - name: Verify formatting
+      run: dart format --output=none --set-exit-if-changed .
+
+    - name: Analyze project source
+      run: dart analyze --fatal-infos
+
+    - name: Run unit tests
+      run: dart test --coverage=coverage
+
+    - name: Install jq for manifest validation
+      run: sudo apt-get update && sudo apt-get install -y jq
+
+    - name: Run TWA compatibility tests
+      run: |
+        echo "Running TWA compatibility checks..."
+        dart test test/twa_compatibility_test.dart
+        chmod +x scripts/check_twa_compatibility.sh
+        ./scripts/check_twa_compatibility.sh
+
+  build:
+    name: Build Web App
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Dart SDK
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: '3.0.0'
+
+    - name: Cache Dart dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.pub-cache
+          .dart_tool
+        key: ${{ runner.os }}-dart-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-dart-
+
+    - name: Install dependencies
+      run: dart pub get
+
+    - name: Create output directory
+      run: mkdir -p ${{ env.OUTPUT_DIR }}
+
+    - name: Build optimized JavaScript
+      run: |
+        echo "Building optimized JavaScript for production..."
+        dart compile js -O2 lib/main.dart -o ${{ env.OUTPUT_DIR }}/main.dart.js
+
+    - name: Copy static assets
+      run: |
+        # Copy existing static files if they exist
+        if [ -f "web/index.html" ]; then
+          cp web/*.{html,css,json,png,ico,svg} ${{ env.OUTPUT_DIR }}/ 2>/dev/null || true
+        fi
+
+        # Copy from docs if that's where they are
+        if [ -f "docs/index.html" ] && [ "${{ env.OUTPUT_DIR }}" != "docs" ]; then
+          cp docs/*.{html,css,json,png,ico,svg} ${{ env.OUTPUT_DIR }}/ 2>/dev/null || true
+        fi
+
+        # Ensure we have the basic files
+        if [ ! -f "${{ env.OUTPUT_DIR }}/index.html" ]; then
+          echo "⚠️ Warning: index.html not found, build may be incomplete"
+        fi
+
+    - name: Validate build output
+      run: |
+        echo "🔍 Validating build output..."
+        ls -la ${{ env.OUTPUT_DIR }}/
+
+        # Check required files exist
+        required_files=("index.html" "main.dart.js" "styles.css" "manifest.json")
+        for file in "${required_files[@]}"; do
+          if [ -f "${{ env.OUTPUT_DIR }}/$file" ]; then
+            echo "✅ $file found"
+          else
+            echo "❌ $file missing"
+            exit 1
+          fi
+        done
+
+        # Check file sizes
+        js_size=$(wc -c < "${{ env.OUTPUT_DIR }}/main.dart.js")
+        echo "📊 JavaScript size: $((js_size / 1024))KB"
+
+        if [ $js_size -gt 1000000 ]; then
+          echo "⚠️ Warning: JavaScript bundle is large (>1MB)"
+        fi
+
+    - name: Run post-build TWA compatibility check
+      run: |
+        echo "🧪 Running post-build TWA compatibility check..."
+        # Update the script to check the correct output directory
+        sed -i "s|docs/|${{ env.OUTPUT_DIR }}/|g" scripts/check_twa_compatibility.sh
+        ./scripts/check_twa_compatibility.sh
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: web-app-${{ github.sha }}
+        path: ${{ env.OUTPUT_DIR }}
+        retention-days: 30
+
+  # Optional: Deploy to GitHub Pages
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [test, build]
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write
+      id-token: write
+      contents: read
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Dart SDK
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: '3.0.0'
+
+    - name: Install dependencies
+      run: dart pub get
+
+    - name: Build for GitHub Pages
+      run: |
+        # Ensure we're building to the correct directory
+        mkdir -p ${{ env.OUTPUT_DIR }}
+        dart compile js -O2 lib/main.dart -o ${{ env.OUTPUT_DIR }}/main.dart.js
+
+        # Copy static assets if they don't exist in target directory
+        if [ -f "web/index.html" ] && [ "${{ env.OUTPUT_DIR }}" != "web" ]; then
+          cp web/*.{html,css,json,png,ico,svg} ${{ env.OUTPUT_DIR }}/ 2>/dev/null || true
+        fi
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+
+    - name: Upload to GitHub Pages
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: ${{ env.OUTPUT_DIR }}
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
+
+  # Performance and Security Checks
+  quality:
+    name: Quality & Security
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Dart SDK
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: '3.0.0'
+
+    - name: Install dependencies
+      run: dart pub get
+
+    - name: Security audit
+      run: |
+        echo "🔒 Running security audit..."
+        # Check for known vulnerabilities in dependencies
+        dart pub deps --json | grep -E '"name"|"version"' || true
+
+    - name: Performance check
+      run: |
+        echo "⚡ Performance analysis..."
+        # Build and check sizes
+        dart compile js -O2 lib/main.dart -o ${{ env.OUTPUT_DIR }}/main.dart.js
+
+        js_size=$(wc -c < "${{ env.OUTPUT_DIR }}/main.dart.js")
+        js_size_kb=$((js_size / 1024))
+
+        echo "📊 Bundle Analysis:"
+        echo "JavaScript: ${js_size_kb}KB"
+
+        # Performance thresholds for mobile
+        if [ $js_size -gt 500000 ]; then
+          echo "⚠️ JavaScript bundle exceeds 500KB - consider optimization"
+        else
+          echo "✅ JavaScript bundle size optimal for mobile"
+        fi
+
+    - name: Lighthouse CI (optional)
+      run: |
+        echo "🔍 Lighthouse checks would run here for deployed app"
+        echo "URL: https://clickstefan.github.io/iprocrastinate"

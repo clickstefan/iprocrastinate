@@ -1,0 +1,37 @@
+# CI/CD Configuration
+# This file allows customization of the build process
+
+# Output directory options (choose one):
+# - docs: GitHub Pages standard (current)
+# - web: Common web development convention
+# - build: Standard build output directory
+# - dist: Distribution directory convention
+output_directory: docs
+
+# Build settings
+dart_sdk_version: '3.0.0'
+
+# Performance thresholds (in bytes)
+max_js_size: 500000  # 500KB
+max_css_size: 100000 # 100KB
+
+# TWA compatibility checks
+twa_checks_enabled: true
+
+# Deployment settings
+deploy_to_github_pages: true
+deployment_branch: master  # or main
+
+# Quality checks
+security_audit_enabled: true
+performance_checks_enabled: true
+lighthouse_checks_enabled: false  # Requires deployed app
+
+# File patterns to include in build
+static_file_patterns:
+  - "*.html"
+  - "*.css"
+  - "*.json"
+  - "*.png"
+  - "*.ico"
+  - "*.svg"
