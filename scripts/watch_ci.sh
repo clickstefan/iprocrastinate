@@ -18,9 +18,9 @@ echo ""
 
 # Function to get latest run for current commit
 get_latest_run() {
-    gh run list --json id,status,conclusion,headSha,workflowName --jq "
+    gh run list --json databaseId,status,conclusion,headSha,workflowName --jq "
         map(select(.headSha == \"$LATEST_COMMIT\")) |
-        sort_by(.id) |
+        sort_by(.databaseId) |
         reverse |
         .[0] // empty
     "
@@ -62,7 +62,7 @@ while true; do
     fi
 
     # Parse run info
-    current_run_id=$(echo "$run_info" | jq -r '.id // empty')
+    current_run_id=$(echo "$run_info" | jq -r '.databaseId // empty')
     status=$(echo "$run_info" | jq -r '.status // empty')
     conclusion=$(echo "$run_info" | jq -r '.conclusion // empty')
     workflow_name=$(echo "$run_info" | jq -r '.workflowName // empty')
