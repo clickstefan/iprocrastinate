@@ -226,3 +226,305 @@ body {
         width: 100%;
     }
 }
+
+/* Notification Settings Styles */
+.notification-settings {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+}
+
+.notification-settings h3 {
+    color: #673AB7;
+    margin-bottom: 20px;
+}
+
+.notification-toggle {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* Toggle Switch Styles */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #673AB7;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.toggle-label {
+    font-size: 1rem;
+    color: #666;
+}
+
+.notification-config {
+    margin-top: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.notification-config h4 {
+    color: #495057;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+/* Time Picker Styles */
+.time-pickers {
+    margin-bottom: 15px;
+}
+
+.time-picker-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.time-input {
+    padding: 8px 12px;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: white;
+}
+
+.time-input:focus {
+    outline: none;
+    border-color: #673AB7;
+}
+
+.remove-time-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove-time-btn:hover {
+    background: #c82333;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+}
+
+/* Weekday Selector Styles */
+.weekday-selector {
+    margin-bottom: 20px;
+}
+
+.weekdays {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.weekday-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    background: #e9ecef;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 0.9rem;
+    user-select: none;
+}
+
+.weekday-item:hover {
+    background: #dee2e6;
+}
+
+.weekday-item input[type="checkbox"] {
+    margin: 0;
+}
+
+.weekday-item input[type="checkbox"]:checked + span,
+.weekday-item:has(input[type="checkbox"]:checked) {
+    background: #673AB7;
+    color: white;
+}
+
+.notification-status {
+    padding: 15px;
+    background: #e7f3ff;
+    border-radius: 6px;
+    border-left: 4px solid #007bff;
+}
+
+.notification-status p {
+    margin: 0;
+    color: #004085;
+    font-size: 0.9rem;
+}
+
+/* Mobile responsive for notifications */
+@media (max-width: 600px) {
+    .weekdays {
+        gap: 5px;
+    }
+
+    .weekday-item {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+
+    .time-picker-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .notification-toggle {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+/* Debug Console Styles (only for localhost) */
+.debug-console {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 300px;
+    background: #1a1a1a;
+    border-top: 2px solid #333;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    z-index: 1000;
+    box-shadow: 0 -4px 8px rgba(0,0,0,0.3);
+}
+
+.debug-header {
+    background: #2a2a2a;
+    padding: 8px 12px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+.debug-header span {
+    color: #ff6b35;
+}
+
+.debug-clear, .debug-toggle {
+    background: #444;
+    color: #fff;
+    border: 1px solid #666;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    margin-left: 5px;
+}
+
+.debug-clear:hover, .debug-toggle:hover {
+    background: #555;
+}
+
+.debug-output {
+    padding: 8px 12px;
+    max-height: 250px;
+    overflow-y: auto;
+    line-height: 1.4;
+}
+
+.debug-log {
+    margin: 2px 0;
+    padding: 2px 0;
+    border-bottom: 1px solid #333;
+}
+
+.debug-log.error {
+    color: #ff4444;
+}
+
+.debug-log.warn {
+    color: #ffaa00;
+}
+
+.debug-log.info {
+    color: #4488ff;
+}
+
+.debug-log.debug {
+    color: #888;
+}
+
+.debug-timestamp {
+    color: #666;
+    font-size: 10px;
+    margin-right: 8px;
+}

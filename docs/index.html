@@ -39,6 +39,61 @@
                 <button id="completeTaskBtn" class="btn-success">Complete Selected Task</button>
                 <button id="clearAllBtn" class="btn-danger">Clear All Tasks</button>
             </div>
+
+            <div class="notification-settings">
+                <h3>📱 Reminder Notifications</h3>
+                <div class="notification-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notificationToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label">Enable reminders (off by default)</span>
+                </div>
+
+                <div class="notification-config" id="notificationConfig" style="display: none;">
+                    <div class="time-picker-section">
+                        <h4>⏰ Reminder Times</h4>
+                        <div id="timePickers" class="time-pickers">
+                            <div class="time-picker-item">
+                                <input type="time" class="time-input" value="09:00">
+                                <button class="remove-time-btn" data-action="remove">×</button>
+                            </div>
+                        </div>
+                        <button id="addTimeBtn" class="btn-secondary">+ Add Time</button>
+                    </div>
+
+                    <div class="weekday-selector">
+                        <h4>📅 Days of the Week</h4>
+                        <div class="weekdays">
+                            <label class="weekday-item">
+                                <input type="checkbox" value="1" checked> Mon
+                            </label>
+                            <label class="weekday-item">
+                                <input type="checkbox" value="2" checked> Tue
+                            </label>
+                            <label class="weekday-item">
+                                <input type="checkbox" value="3" checked> Wed
+                            </label>
+                            <label class="weekday-item">
+                                <input type="checkbox" value="4" checked> Thu
+                            </label>
+                            <label class="weekday-item">
+                                <input type="checkbox" value="5" checked> Fri
+                            </label>
+                            <label class="weekday-item">
+                                <input type="checkbox" value="6"> Sat
+                            </label>
+                            <label class="weekday-item">
+                                <input type="checkbox" value="0"> Sun
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="notification-status">
+                        <p id="notificationStatus">Click "Enable reminders" to set up notifications</p>
+                    </div>
+                </div>
+            </div>
         </main>
 
         <footer class="app-footer">
@@ -46,6 +101,106 @@
         </footer>
     </div>
 
+    <!-- Debug Console (only shows on localhost) -->
+    <div id="debugConsole" class="debug-console" style="display: none;">
+        <div class="debug-header">
+            <span>🐛 Debug Console</span>
+            <button id="clearConsole" class="debug-clear">Clear</button>
+            <button id="toggleConsole" class="debug-toggle">Hide</button>
+        </div>
+        <div id="debugOutput" class="debug-output"></div>
+    </div>
+
     <script src="main.dart.js" defer></script>
+    <script>
+        // Debug Console for localhost
+        (function() {
+            const isLocalhost = window.location.hostname === 'localhost' ||
+                               window.location.hostname === '127.0.0.1' ||
+                               window.location.hostname === '';
+
+            if (isLocalhost) {
+                const debugConsole = document.getElementById('debugConsole');
+                const debugOutput = document.getElementById('debugOutput');
+                const clearBtn = document.getElementById('clearConsole');
+                const toggleBtn = document.getElementById('toggleConsole');
+
+                let isVisible = true;
+
+                // Show debug console
+                debugConsole.style.display = 'block';
+
+                // Store original console methods
+                const originalLog = console.log;
+                const originalError = console.error;
+                const originalWarn = console.warn;
+                const originalInfo = console.info;
+
+                function addDebugLog(message, type = 'log') {
+                    const timestamp = new Date().toLocaleTimeString();
+                    const logElement = document.createElement('div');
+                    logElement.className = `debug-log ${type}`;
+                    logElement.innerHTML = `<span class="debug-timestamp">${timestamp}</span>${message}`;
+                    debugOutput.appendChild(logElement);
+                    debugOutput.scrollTop = debugOutput.scrollHeight;
+                }
+
+                // Override console methods
+                console.log = function(...args) {
+                    originalLog.apply(console, args);
+                    addDebugLog(args.join(' '), 'log');
+                };
+
+                console.error = function(...args) {
+                    originalError.apply(console, args);
+                    addDebugLog(args.join(' '), 'error');
+                };
+
+                console.warn = function(...args) {
+                    originalWarn.apply(console, args);
+                    addDebugLog(args.join(' '), 'warn');
+                };
+
+                console.info = function(...args) {
+                    originalInfo.apply(console, args);
+                    addDebugLog(args.join(' '), 'info');
+                };
+
+                // Clear button
+                clearBtn.addEventListener('click', () => {
+                    debugOutput.innerHTML = '';
+                });
+
+                // Toggle button
+                toggleBtn.addEventListener('click', () => {
+                    if (isVisible) {
+                        debugOutput.style.display = 'none';
+                        toggleBtn.textContent = 'Show';
+                        isVisible = false;
+                    } else {
+                        debugOutput.style.display = 'block';
+                        toggleBtn.textContent = 'Hide';
+                        isVisible = true;
+                    }
+                });
+
+                // Initial debug message
+                console.log('🐛 Debug console initialized for localhost');
+            }
+        })();
+
+        // Register service worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
