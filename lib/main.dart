@@ -1,4 +1,5 @@
 import 'dart:html' as html;
+import 'dart:convert';
 
 void main() {
   iProcrastinateApp().init();
@@ -18,6 +19,28 @@ class Task {
     this.isCompleted = false,
     this.isSelected = false,
   });
+
+  // Convert Task to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'text': text,
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'isCompleted': isCompleted,
+      'isSelected': isSelected,
+    };
+  }
+
+  // Create Task from JSON
+  factory Task.fromJson(Map<String, dynamic> json) {
+    return Task(
+      id: json['id'] as String,
+      text: json['text'] as String,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
+      isCompleted: json['isCompleted'] as bool? ?? false,
+      isSelected: json['isSelected'] as bool? ?? false,
+    );
+  }
 }
 
 class iProcrastinateApp {
@@ -164,31 +187,49 @@ class iProcrastinateApp {
   }
 
   void saveToStorage() {
-    // Save to localStorage
-    final taskData = tasks
-        .map((task) => {
-              'id': task.id,
-              'text': task.text,
-              'createdAt': task.createdAt.millisecondsSinceEpoch,
-              'isCompleted': task.isCompleted,
-            })
-        .toList();
+    try {
+      // Save tasks as JSON
+      final taskDataList = tasks.map((task) => task.toJson()).toList();
+      final tasksJson = jsonEncode(taskDataList);
+      html.window.localStorage['iprocrastinate_tasks'] = tasksJson;
 
-    html.window.localStorage['iprocrastinate_tasks'] = taskData.toString();
-    html.window.localStorage['iprocrastinate_completed_count'] =
-        completedCount.toString();
+      // Save completed count
+      html.window.localStorage['iprocrastinate_completed_count'] =
+          completedCount.toString();
+
+      print('Tasks saved to localStorage: ${tasks.length} tasks');
+    } catch (e) {
+      print('Error saving to storage: $e');
+    }
   }
 
   void loadFromStorage() {
     try {
+      // Load completed count
       final completedCountStr =
           html.window.localStorage['iprocrastinate_completed_count'];
       if (completedCountStr != null) {
         completedCount = int.tryParse(completedCountStr) ?? 0;
       }
 
-      // For now, start fresh each session - can implement proper JSON parsing later
-      tasks = [];
+      // Load tasks from JSON
+      final tasksJsonStr = html.window.localStorage['iprocrastinate_tasks'];
+      if (tasksJsonStr != null && tasksJsonStr.isNotEmpty) {
+        final List<dynamic> tasksJsonList = jsonDecode(tasksJsonStr);
+        tasks = tasksJsonList
+            .map((taskJson) => Task.fromJson(taskJson as Map<String, dynamic>))
+            .toList();
+
+        // Reset selected state on load (don't persist selection across sessions)
+        for (var task in tasks) {
+          task.isSelected = false;
+        }
+
+        print('Tasks loaded from localStorage: ${tasks.length} tasks');
+      } else {
+        tasks = [];
+        print('No saved tasks found, starting fresh');
+      }
     } catch (e) {
       print('Error loading from storage: $e');
       tasks = [];
