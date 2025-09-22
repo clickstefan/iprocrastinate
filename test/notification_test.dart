@@ -1,3 +1,4 @@
+@TestOn('browser')
 import 'package:test/test.dart';
 import 'dart:html' as html;
 
@@ -12,16 +13,19 @@ void main() {
     test('service worker registration affects notification API', () {
       // This test would catch the issue we encountered
       if (html.window.navigator.serviceWorker != null) {
-        print('Service worker detected - notifications should use ServiceWorkerRegistration.showNotification()');
+        print(
+            'Service worker detected - notifications should use ServiceWorkerRegistration.showNotification()');
 
         // In a real test environment, we could mock this
         expect(() {
           // This would fail if service worker is registered
-          final notification = html.Notification('Test', body: 'Test message');
+          html.Notification('Test', body: 'Test message');
         }, throwsA(isA<html.DomException>()),
-        reason: 'Direct Notification constructor should fail when service worker is registered');
+            reason:
+                'Direct Notification constructor should fail when service worker is registered');
       } else {
-        print('No service worker - direct Notification constructor should work');
+        print(
+            'No service worker - direct Notification constructor should work');
       }
     });
 
@@ -63,7 +67,8 @@ void main() {
     test('notification scheduling logic', () {
       // Test time and weekday matching
       final now = DateTime.now();
-      final currentTime = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+      final currentTime =
+          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
       final currentWeekday = now.weekday % 7;
 
       expect(currentTime, matches(r'^\d{2}:\d{2}$'));
