@@ -41,3 +41,36 @@ Visit the web app at: **http://localhost:8080** (when running locally)
 - HTML5 / CSS3
 - Progressive Web App
 - Local Storage API
+
+## 📱 Publishing to Google Play Store (TWA)
+
+### Requirements
+- Google Play Developer account ($25 one-time fee)
+- Web app deployed with HTTPS (GitHub Pages works)
+- Android development tools
+
+### Steps
+1. **Deploy web app first:**
+   ```bash
+   # Build for production
+   dart compile js -O2 lib/main.dart -o web/main.dart.js
+   # Deploy to GitHub Pages or any HTTPS hosting
+   ```
+
+2. **Create TWA (Trusted Web Activities) wrapper:**
+   - Use Android Studio TWA template
+   - Configure to load your web app URL
+   - Add Digital Asset Links verification file
+
+3. **Build and publish:**
+   ```bash
+   # Generate signed app bundle
+   ./gradlew bundleRelease
+   # Upload to Google Play Console
+   ```
+
+4. **TWA Benefits:**
+   - Wraps web app in native Android container
+   - Full Play Store distribution
+   - Native Android notifications support
+   - Minimal additional code required
