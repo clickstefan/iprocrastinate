@@ -496,22 +496,21 @@ class iProcrastinateApp {
       final serviceWorker = html.window.navigator.serviceWorker;
       if (serviceWorker != null) {
         final registration = await serviceWorker.ready;
-        if (registration != null) {
-          // Use service worker notification
-          final options = {
-            'body': message,
-            'icon': 'icon-192.png',
-            'tag': 'iprocrastinate-reminder',
-            'requireInteraction': false,
-            'silent': false,
-          };
+        // Use service worker notification
+        final options = {
+          'body': message,
+          'icon': 'icon-192.png',
+          'tag': 'iprocrastinate-reminder',
+          'requireInteraction': false,
+          'silent': false,
+        };
 
-          // Call showNotification with proper syntax
-          final jsRegistration = registration as dynamic;
-          await jsRegistration.showNotification('iProcrastinate Reminder', options);
-          print('Service worker notification sent: $message');
-          return;
-        }
+        // Call showNotification with proper syntax
+        final jsRegistration = registration as dynamic;
+        await jsRegistration.showNotification(
+            'iProcrastinate Reminder', options);
+        print('Service worker notification sent: $message');
+        return;
       }
 
       // Fallback to direct notification if no service worker
@@ -534,7 +533,7 @@ class iProcrastinateApp {
       // Try one more fallback approach
       try {
         print('Attempting fallback notification...');
-        final notification = html.Notification(
+        html.Notification(
           'iProcrastinate Reminder',
           body: message,
           icon: 'icon-192.png',
