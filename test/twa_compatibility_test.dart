@@ -174,11 +174,11 @@ void main() {
 
     group('TWA-Specific Validation', () {
       test('file structure is TWA-compatible', () {
-        // Check that required files exist
+        // Check that required static files exist (JavaScript is built by CI)
         expect(File('docs/index.html').existsSync(), isTrue);
         expect(File('docs/manifest.json').existsSync(), isTrue);
-        expect(File('docs/main.dart.js').existsSync(), isTrue);
         expect(File('docs/styles.css').existsSync(), isTrue);
+        // Note: main.dart.js is built by CI and deployed automatically
       });
 
       test('manifest scope is properly configured', () {
