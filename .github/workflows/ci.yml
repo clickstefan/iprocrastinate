@@ -23,7 +23,7 @@ jobs:
     - name: Setup Dart SDK
       uses: dart-lang/setup-dart@v1
       with:
-        sdk: '3.1.0'
+        sdk: 'stable'
 
     - name: Cache Dart dependencies
       uses: actions/cache@v3
@@ -69,7 +69,7 @@ jobs:
     - name: Setup Dart SDK
       uses: dart-lang/setup-dart@v1
       with:
-        sdk: '3.1.0'
+        sdk: 'stable'
 
     - name: Cache Dart dependencies
       uses: actions/cache@v3
@@ -171,7 +171,7 @@ jobs:
     - name: Setup Dart SDK
       uses: dart-lang/setup-dart@v1
       with:
-        sdk: '3.1.0'
+        sdk: 'stable'
 
     - name: Install dependencies
       run: dart pub get
@@ -212,7 +212,7 @@ jobs:
     - name: Setup Dart SDK
       uses: dart-lang/setup-dart@v1
       with:
-        sdk: '3.1.0'
+        sdk: 'stable'
 
     - name: Install dependencies
       run: dart pub get
