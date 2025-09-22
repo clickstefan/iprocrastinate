@@ -89,8 +89,9 @@ simulate_job() {
                 fi
                 ;;
             "Build optimized JavaScript")
-                if dart compile js -O2 lib/main.dart -o "$OUTPUT_DIR/main.dart.js" >/dev/null 2>&1; then
+                if dart compile js -O2 lib/main.dart -o .ci_test_build.js >/dev/null 2>&1; then
                     echo -e "${GREEN}✅${NC}"
+                    rm -f .ci_test_build.js* 2>/dev/null
                 else
                     echo -e "${RED}❌ Build failed${NC}"
                     job_status=1
@@ -131,9 +132,11 @@ simulate_job() {
                 fi
                 ;;
             "Performance check")
-                if [ -f "$OUTPUT_DIR/main.dart.js" ]; then
-                    local js_size=$(wc -c < "$OUTPUT_DIR/main.dart.js")
+                # Build temporarily for size check
+                if dart compile js -O2 lib/main.dart -o .perf_test_build.js >/dev/null 2>&1; then
+                    local js_size=$(wc -c < .perf_test_build.js)
                     local js_size_kb=$((js_size / 1024))
+                    rm -f .perf_test_build.js* 2>/dev/null
 
                     if [ $js_size -lt 500000 ]; then
                         echo -e "${GREEN}✅ (${js_size_kb}KB)${NC}"
@@ -141,7 +144,7 @@ simulate_job() {
                         echo -e "${YELLOW}⚠️  Large bundle (${js_size_kb}KB)${NC}"
                     fi
                 else
-                    echo -e "${YELLOW}⚠️  No build found${NC}"
+                    echo -e "${YELLOW}⚠️  Build failed${NC}"
                 fi
                 ;;
             *)

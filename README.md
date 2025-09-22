@@ -20,9 +20,10 @@ A modern web app to help overcome procrastination and boost productivity.
 ### Development
 1. Clone the repository
 2. Install dependencies: `dart pub get`
-3. Compile to JavaScript: `dart compile js lib/main.dart -o docs/main.dart.js`
-4. Start local server: `cd docs && python -m http.server 8080`
-5. Open http://localhost:8080 in your browser
+3. Start local server: `cd docs && python -m http.server 8080`
+4. Open http://localhost:8080 in your browser
+
+**Note**: JavaScript compilation is handled automatically by CI/CD. Local development uses the existing compiled files or you can build temporarily for testing with `dart compile js lib/main.dart -o test_build.js` (don't commit this).
 
 ## ✨ Features
 

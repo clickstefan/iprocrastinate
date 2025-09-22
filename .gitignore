@@ -42,3 +42,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Compiled JavaScript files (built by CI)
+docs/main.dart.js
+docs/main.dart.js.map
+docs/main.dart.js.deps
