@@ -37,6 +37,27 @@ A modern web app to help overcome procrastination and boost productivity.
 - **Storage**: Browser localStorage for persistence
 - **Responsive**: Mobile-first design
 
+## 🧪 Testing
+
+### TWA Compatibility Testing
+Ensures the app meets all Trusted Web Activities requirements:
+
+```bash
+# Run TWA compatibility tests
+dart test test/twa_compatibility_test.dart
+
+# Run complete compatibility check
+./scripts/check_twa_compatibility.sh
+```
+
+**What we test:**
+- ✅ Manifest.json validation (PWA requirements)
+- ✅ HTML structure (viewport, theme-color, responsive)
+- ✅ No external dependencies (CDN-free)
+- ✅ File sizes optimized for mobile
+- ✅ TWA-specific requirements (relative URLs, display mode)
+- ✅ Performance benchmarks
+
 ## 🧰 Tech Stack
 
 - Dart 3.x
