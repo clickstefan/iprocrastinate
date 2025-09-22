@@ -141,7 +141,7 @@ jobs:
         ./scripts/check_twa_compatibility.sh
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: web-app-${{ github.sha }}
         path: ${{ env.OUTPUT_DIR }}
