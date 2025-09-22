@@ -1,21 +1,16 @@
 name: iprocrastinate
-description: A productivity app to help overcome procrastination.
+description: A productivity web app to help overcome procrastination.
 publish_to: 'none'
 version: 1.0.0+1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
-  flutter: ">=3.10.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
-  cupertino_icons: ^1.0.2
+  http: ^1.1.0
+  web: ^1.0.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^2.0.0
-
-flutter:
-  uses-material-design: true
+  build_runner: ^2.4.7
+  build_web_compilers: ^4.0.7
+  lints: ^3.0.0

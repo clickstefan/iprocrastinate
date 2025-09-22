@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iProcrastinate - Stop Procrastination</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#673AB7">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+</head>
+<body>
+    <div id="app">
+        <header class="app-header">
+            <h1>iProcrastinate</h1>
+            <p class="subtitle">Stop procrastinating and get things done!</p>
+        </header>
+
+        <main class="main-content">
+            <div class="stats-card">
+                <h2>Tasks Completed</h2>
+                <div class="counter" id="taskCounter">0</div>
+            </div>
+
+            <div class="task-section">
+                <h3>Add New Task</h3>
+                <div class="input-group">
+                    <input type="text" id="taskInput" placeholder="What do you need to do?" maxlength="100">
+                    <button id="addTaskBtn" class="btn-primary">Add Task</button>
+                </div>
+            </div>
+
+            <div class="task-list-section">
+                <h3>Your Tasks</h3>
+                <ul id="taskList" class="task-list"></ul>
+            </div>
+
+            <div class="actions">
+                <button id="completeTaskBtn" class="btn-success">Complete Selected Task</button>
+                <button id="clearAllBtn" class="btn-danger">Clear All Tasks</button>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p>Stay focused, stay productive!</p>
+        </footer>
+    </div>
+
+    <script src="main.dart.js" defer></script>
+</body>
+</html>
