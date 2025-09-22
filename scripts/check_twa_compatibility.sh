@@ -6,10 +6,10 @@
 echo "🔍 Checking TWA Compatibility..."
 echo "=================================="
 
-# Check if required files exist
+# Check if required static files exist (JavaScript is built by CI)
 echo "📁 Checking file structure..."
 
-required_files=("docs/index.html" "docs/manifest.json" "docs/main.dart.js" "docs/styles.css")
+required_files=("docs/index.html" "docs/manifest.json" "docs/styles.css")
 for file in "${required_files[@]}"; do
     if [ -f "$file" ]; then
         echo "✅ $file exists"
@@ -18,6 +18,8 @@ for file in "${required_files[@]}"; do
         exit 1
     fi
 done
+
+echo "📝 Note: main.dart.js is built automatically by CI/CD"
 
 # Check manifest.json structure
 echo ""
