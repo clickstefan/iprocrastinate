@@ -14,8 +14,8 @@ Visit the web app at: **http://localhost:8080** (when running locally)
 ### Development
 1. Clone the repository
 2. Install dependencies: `dart pub get`
-3. Compile to JavaScript: `dart compile js lib/main.dart -o web/main.dart.js`
-4. Start local server: `cd web && python -m http.server 8080`
+3. Compile to JavaScript: `dart compile js lib/main.dart -o docs/main.dart.js`
+4. Start local server: `cd docs && python -m http.server 8080`
 5. Open http://localhost:8080 in your browser
 
 ## ✨ Features
@@ -53,7 +53,7 @@ Visit the web app at: **http://localhost:8080** (when running locally)
 1. **Deploy web app first:**
    ```bash
    # Build for production
-   dart compile js -O2 lib/main.dart -o web/main.dart.js
+   dart compile js -O2 lib/main.dart -o docs/main.dart.js
    # Deploy to GitHub Pages or any HTTPS hosting
    ```
 
