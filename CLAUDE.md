@@ -1,3 +1,4 @@
 - all changes here must be compatible with TWA, make sure to plan and add tests to keep things compatible
 - when errors are fixed, if a new error add it to @TROUBLESHOOTING.md
 - when CI fails but local pre commit hooks passes, update the checks if possible to avoid bad commits in the future
+- use @DEVELOPMENT_WORKFLOW.md when making changes.
