@@ -4,10 +4,43 @@
 
 This guide covers the complete development workflow from code changes to deployment, including local testing, GitHub CLI integration, and CI/CD monitoring.
 
+## 📁 Critical: Understanding File Structure
+
+### **ALWAYS COMMIT** ✅
+```
+lib/main.dart              ← Dart source code
+test/                      ← Test files
+docs/index.html            ← HTML template with notification UI
+docs/styles.css            ← CSS styles with notification components
+docs/manifest.json         ← PWA manifest for TWA compatibility
+docs/sw.js                 ← Service worker for notifications
+Makefile                   ← Build commands
+.gitignore                 ← Git ignore rules
+```
+
+### **NEVER COMMIT** ❌
+```
+docs/main.dart.js          ← Compiled JavaScript (375KB)
+docs/main.dart.js.map      ← Source maps (170KB)
+docs/main.dart.js.deps     ← Dependencies (11KB)
+```
+
+### **Why This Matters**
+- **HTML/CSS/Manifest/SW** are source templates containing the notification system UI
+- **JavaScript files** are compiled build artifacts that change with every build
+- **CI automatically compiles** Dart to JS, so committing JS creates conflicts
+- **Local development** needs `make build` first to generate the JS files
+- **File sizes** matter for TWA performance (keep total under 1MB)
+
 ## 📋 Quick Reference
 
 ### Essential Commands
 ```bash
+# Build process (REQUIRED for local development)
+make build                 # Compile Dart to JavaScript
+make clean                 # Remove generated files
+make test                  # Build + run tests
+
 # Fast validation (10 seconds)
 ./scripts/quick_check.sh
 
@@ -19,6 +52,21 @@ This guide covers the complete development workflow from code changes to deploym
 
 # Setup automatic validation
 ./scripts/setup_git_hooks.sh
+```
+
+### File Management Commands
+```bash
+# Check what's staged for commit
+git status
+
+# See what changed in source files
+git diff lib/ test/ docs/ Makefile .gitignore
+
+# SAFE: Add only source files
+git add lib/ test/ docs/index.html docs/styles.css docs/manifest.json docs/sw.js Makefile
+
+# DANGER: Never add these
+git add docs/main.dart.js*  # ❌ DON'T DO THIS
 ```
 
 ### GitHub CLI Build Monitoring
@@ -62,11 +110,28 @@ gh --version    # For CI monitoring
 
 #### Make Code Changes
 ```bash
-# Edit your code
-code lib/main.dart
-code docs/styles.css
-# etc.
+# Edit your source code
+code lib/main.dart          # Dart logic
+code docs/index.html        # HTML template
+code docs/styles.css        # CSS styles
+code docs/manifest.json     # PWA manifest
+code docs/sw.js            # Service worker
+code test/               # Tests
 ```
+
+#### Build for Local Testing
+```bash
+# REQUIRED: Build before testing locally
+make build                  # Compiles lib/main.dart → docs/main.dart.js
+
+# Alternative: Individual commands
+dart compile js lib/main.dart -o docs/main.dart.js
+```
+
+**⚠️ Important**: Local development requires building first because:
+- The HTML template loads `main.dart.js`
+- This file is generated from `lib/main.dart`
+- Without building, the app won't work locally
 
 #### Quick Validation (10 seconds)
 ```bash
@@ -112,9 +177,24 @@ dart analyze
 
 #### Commit Changes
 ```bash
+# Check what's changed
+git status
+
+# SAFE: Add only source files (recommended)
+git add lib/ test/ docs/index.html docs/styles.css docs/manifest.json docs/sw.js Makefile
+
+# ALTERNATIVE: Add all non-ignored files (be careful!)
 git add .
+
+# Commit with descriptive message
 git commit -m "feat: your change description"
 ```
+
+**⚠️ Critical File Rules:**
+- ✅ **ALWAYS commit**: `lib/`, `test/`, `docs/*.html`, `docs/*.css`, `docs/*.json`, `docs/sw.js`
+- ❌ **NEVER commit**: `docs/main.dart.js*` (these are auto-generated)
+- 🔍 **Check .gitignore**: Compiled files should be automatically ignored
+
 **Note:** If you installed git hooks, validation runs automatically
 
 ### 4. **Pre-Push Phase**
@@ -483,13 +563,43 @@ git push --no-verify  # Skip pre-push hooks
 # 1. Clean everything
 dart pub get
 dart clean
-rm -f docs/main.dart.js*
+make clean                  # Removes docs/main.dart.js*
 
 # 2. Fresh build
-dart compile js lib/main.dart -o docs/main.dart.js
+make build                  # Recompiles everything
 
 # 3. Full validation
 ./scripts/simulate_ci.sh
+```
+
+### Accidentally Committed Generated Files
+```bash
+# 1. Remove from git tracking (keeps local files)
+git rm --cached docs/main.dart.js docs/main.dart.js.map docs/main.dart.js.deps
+
+# 2. Ensure .gitignore is correct
+cat .gitignore | grep "main.dart.js"
+# Should show: docs/main.dart.js, docs/main.dart.js.map, docs/main.dart.js.deps
+
+# 3. Commit the removal
+git commit -m "fix: remove generated files from git tracking"
+
+# 4. Rebuild locally for testing
+make build
+```
+
+### Git Status Shows Generated Files
+```bash
+# Check if .gitignore is working
+git check-ignore docs/main.dart.js
+# Should output: docs/main.dart.js (meaning it's ignored)
+
+# If not ignored, add to .gitignore:
+echo "docs/main.dart.js" >> .gitignore
+echo "docs/main.dart.js.map" >> .gitignore
+echo "docs/main.dart.js.deps" >> .gitignore
+git add .gitignore
+git commit -m "fix: ignore generated JavaScript files"
 ```
 
 ### Git Hooks Causing Issues

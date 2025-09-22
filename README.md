@@ -16,14 +16,50 @@ A modern web app to help overcome procrastination and boost productivity.
 
 ### Prerequisites
 - Dart SDK (3.0+)
+- Make (for build commands)
 
-### Development
+### Quick Start
 1. Clone the repository
 2. Install dependencies: `dart pub get`
-3. Start local server: `cd docs && python -m http.server 8080`
-4. Open http://localhost:8080 in your browser
+3. Build the application: `make build`
+4. Start local server: `cd docs && python -m http.server 8080`
+5. Open http://localhost:8080 in your browser
 
-**Note**: JavaScript compilation is handled automatically by CI/CD. Local development uses the existing compiled files or you can build temporarily for testing with `dart compile js lib/main.dart -o test_build.js` (don't commit this).
+## 📁 File Structure & Build Process
+
+### **Source Files (Committed to Git)**
+```
+lib/main.dart              ← Dart source code
+test/                      ← Test files
+docs/index.html            ← HTML template
+docs/styles.css            ← CSS styles
+docs/manifest.json         ← PWA manifest
+docs/sw.js                 ← Service worker
+Makefile                   ← Build commands
+```
+
+### **Generated Files (Never Commit!)**
+```
+docs/main.dart.js          ← Compiled JavaScript
+docs/main.dart.js.map      ← Source maps
+docs/main.dart.js.deps     ← Dependencies
+```
+
+### **Build Commands**
+```bash
+make format    # Format Dart code
+make analyze   # Static analysis
+make build     # Compile Dart to JavaScript
+make test      # Run tests (builds first)
+make check     # Full pre-commit validation
+make clean     # Remove generated files
+```
+
+### **Why This Structure?**
+- **HTML/CSS/Manifest** are templates with notification UI - they're source files
+- **JavaScript files** are compiled from Dart - they're build artifacts
+- **CI automatically builds** the JavaScript, no need to commit it
+- **Local development** requires building first to test the full app
 
 ## ✨ Features
 
