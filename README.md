@@ -41,18 +41,75 @@ A modern web app to help overcome procrastination and boost productivity.
 - **Storage**: Browser localStorage for persistence
 - **Responsive**: Mobile-first design
 
-## 🧪 Testing & CI/CD
+## 🧪 Development Workflow & CI/CD
 
-### Local Testing & Validation
+### 📚 **Complete Workflow Documentation**
 
-#### **🚀 Quick Commands (catch 90% of CI issues)**
+We provide comprehensive guides for efficient development with minimal CI failures:
+
+- **[📋 DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md)** - Complete development workflow from code to deployment
+- **[🔧 GITHUB_CLI_GUIDE.md](./GITHUB_CLI_GUIDE.md)** - GitHub CLI integration for build monitoring
+- **[🚨 TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** - Solutions for common CI/CD issues
+- **[🗺️ WORKFLOW_FLOWCHART.md](./WORKFLOW_FLOWCHART.md)** - Visual decision tree for workflow optimization
+
+### ⚡ **Quick Start Workflow**
+
+#### **🚀 Essential Commands (catch 90% of CI issues)**
 ```bash
 ./scripts/quick_check.sh           # ⚡ 10-second essential checks
-./scripts/pre_commit_check.sh      # 🔍 Comprehensive validation
-./scripts/simulate_ci.sh           # 🤖 Complete CI simulation
+./scripts/pre_commit_check.sh      # 🔍 Comprehensive validation (30s)
+./scripts/simulate_ci.sh           # 🤖 Complete CI simulation (60s)
+./scripts/setup_git_hooks.sh       # 🔧 Install automatic validation
 ```
 
-#### **📋 Individual Checks**
+#### **📊 GitHub CLI Build Monitoring**
+```bash
+gh run list --limit 5              # Check recent build status
+gh run watch                       # Monitor latest build live
+gh run view --log-failed           # Get failure logs quickly
+./scripts/watch_ci.sh              # Enhanced real-time monitoring
+```
+
+#### **🔄 Recommended Development Flow**
+
+**1. Setup (once):**
+```bash
+./scripts/setup_git_hooks.sh       # Auto-validation on commit/push
+```
+
+**2. During development:**
+```bash
+# After changes (fast feedback)
+./scripts/quick_check.sh           # 10 seconds
+
+# Before committing (thorough check)
+./scripts/pre_commit_check.sh      # 30 seconds
+```
+
+**3. Before pushing:**
+```bash
+./scripts/simulate_ci.sh           # 60 seconds, prevents CI failures
+```
+
+**4. After pushing:**
+```bash
+gh run watch                       # Monitor CI in real-time
+# or
+./scripts/watch_ci.sh              # Enhanced monitoring with auto-logs
+```
+
+### 🎯 **Quick Problem Solving**
+
+| Problem | Quick Fix | Documentation |
+|---------|-----------|---------------|
+| ❌ **CI Failed** | `gh run view --log-failed` | [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) |
+| 🎨 **Formatting** | `dart format .` | [Common Issues](./TROUBLESHOOTING.md#code-formatting-issues) |
+| 🔍 **Analysis** | `dart analyze` | [Static Analysis](./TROUBLESHOOTING.md#static-analysis-warnings) |
+| 🧪 **Tests** | `dart test` | [Test Failures](./TROUBLESHOOTING.md#test-failures) |
+| 🏗️ **Build** | Check syntax in `lib/main.dart` | [Build Issues](./TROUBLESHOOTING.md#build-compilation-errors) |
+| 📱 **TWA** | `./scripts/check_twa_compatibility.sh` | [TWA Guide](./TROUBLESHOOTING.md#twa-compatibility-failures) |
+
+### 📋 **Individual Validation Commands**
 ```bash
 # Code quality
 dart format .                      # Fix formatting
@@ -65,37 +122,6 @@ dart test test/twa_compatibility_test.dart
 
 # Build validation
 dart compile js lib/main.dart -o docs/main.dart.js
-```
-
-#### **🔧 Git Hooks (Automatic Validation)**
-```bash
-./scripts/setup_git_hooks.sh       # Install pre-commit validation
-
-# What gets installed:
-# • pre-commit: Runs validation before each commit
-# • pre-push: Simulates CI before pushing
-# • commit-msg: Validates commit message format
-```
-
-#### **💡 Workflow Recommendations**
-
-**Before committing:**
-```bash
-./scripts/quick_check.sh           # Fast check (10s)
-# If issues found:
-dart format .                      # Fix most common issues
-./scripts/pre_commit_check.sh      # Comprehensive check
-```
-
-**Before pushing:**
-```bash
-./scripts/simulate_ci.sh           # Full CI simulation (30s)
-# Catches: formatting, analysis, tests, TWA, build, performance
-```
-
-**Setup once:**
-```bash
-./scripts/setup_git_hooks.sh       # Auto-validation on commit/push
 ```
 
 ### GitHub Actions Workflow
@@ -161,6 +187,68 @@ performance_checks_enabled: true
 - ✅ TWA-specific requirements (relative URLs, display mode)
 - ✅ Performance benchmarks
 - ✅ Security vulnerabilities
+
+## 📚 Complete Documentation Suite
+
+This project includes comprehensive documentation for efficient development:
+
+### 🔧 **Core Workflow Guides**
+- **[📋 DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md)** - Complete development workflow from setup to deployment
+  - Step-by-step development phases
+  - Local testing integration
+  - CI monitoring workflows
+  - Best practices and optimization tips
+
+- **[🔧 GITHUB_CLI_GUIDE.md](./GITHUB_CLI_GUIDE.md)** - Master GitHub CLI for build monitoring
+  - Real-time build monitoring commands
+  - Failure analysis and log retrieval
+  - Advanced CLI queries and automation
+  - Mobile/Termux optimization tips
+
+### 🚨 **Problem Resolution**
+- **[🚨 TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** - Solutions for 95% of common CI issues
+  - Quick fixes for formatting, analysis, tests, and build errors
+  - Emergency recovery procedures
+  - Pattern recognition for recurring issues
+  - Advanced debugging techniques
+
+- **[🗺️ WORKFLOW_FLOWCHART.md](./WORKFLOW_FLOWCHART.md)** - Visual decision trees
+  - Quick command selection flowchart
+  - Situation-specific workflows
+  - Error recovery flowcharts
+  - Efficiency optimization matrix
+
+### 🛠️ **Local Development Tools**
+We provide 4 powerful scripts for local validation:
+
+| Script | Speed | Purpose | When to Use |
+|--------|-------|---------|-------------|
+| `quick_check.sh` | 10s | Essential checks | During development |
+| `pre_commit_check.sh` | 30s | Comprehensive validation | Before commits |
+| `simulate_ci.sh` | 60s | Complete CI simulation | Before pushes |
+| `setup_git_hooks.sh` | Once | Automatic validation | Initial setup |
+
+### 📱 **TWA/Play Store Ready**
+- Complete TWA compatibility testing
+- Optimized for Google Play Store deployment
+- Progressive Web App standards compliance
+- Mobile-first responsive design
+
+### 💡 **Getting Started with Documentation**
+
+**New developers should read in this order:**
+1. **README.md** (this file) - Project overview and quick start
+2. **[DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md)** - Complete workflow guide
+3. **[WORKFLOW_FLOWCHART.md](./WORKFLOW_FLOWCHART.md)** - Visual workflow decision tree
+
+**When encountering issues:**
+1. **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** - Quick fixes for common problems
+2. **[GITHUB_CLI_GUIDE.md](./GITHUB_CLI_GUIDE.md)** - Advanced CI monitoring and debugging
+
+**For CI/CD optimization:**
+- Use the local testing scripts extensively
+- Install git hooks for automatic validation
+- Follow the workflow recommendations in the guides
 
 ## 🧰 Tech Stack
 
