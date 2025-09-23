@@ -95,6 +95,13 @@ class iProcrastinateApp {
   late html.ButtonElement addTimeBtn;
   late html.Element notificationStatus;
 
+  // Debug UI elements
+  late html.Element debugSection;
+  late html.ButtonElement testNotificationBtn;
+  late html.ButtonElement checkPermissionsBtn;
+  late html.ButtonElement checkSwBtn;
+  late html.Element debugStatus;
+
   void init() {
     // Get DOM elements
     taskCounter = html.querySelector('#taskCounter')!;
@@ -112,6 +119,23 @@ class iProcrastinateApp {
     timePickers = html.querySelector('#timePickers')!;
     addTimeBtn = html.querySelector('#addTimeBtn') as html.ButtonElement;
     notificationStatus = html.querySelector('#notificationStatus')!;
+
+    // Get debug DOM elements
+    debugSection = html.querySelector('#debugSection')!;
+    testNotificationBtn =
+        html.querySelector('#testNotificationBtn') as html.ButtonElement;
+    checkPermissionsBtn =
+        html.querySelector('#checkPermissionsBtn') as html.ButtonElement;
+    checkSwBtn = html.querySelector('#checkSwBtn') as html.ButtonElement;
+    debugStatus = html.querySelector('#debugStatus')!;
+
+    // Show debug section on localhost
+    if (html.window.location.hostname == 'localhost' ||
+        html.window.location.hostname == '127.0.0.1') {
+      debugSection.style.display = 'block';
+      debugLog('Debug mode enabled for localhost');
+    }
+    ;
 
     // Set up event listeners
     addTaskBtn.onClick.listen((_) => addTask());
@@ -135,6 +159,11 @@ class iProcrastinateApp {
         removeTimeSlot(target!);
       }
     });
+
+    // Debug event listeners
+    testNotificationBtn.onClick.listen((_) => testNotification());
+    checkPermissionsBtn.onClick.listen((_) => checkNotificationPermissions());
+    checkSwBtn.onClick.listen((_) => checkServiceWorker());
 
     taskInput.onKeyPress.listen((event) {
       if (event.keyCode == 13) {
@@ -543,5 +572,133 @@ class iProcrastinateApp {
         print('Fallback notification also failed: $fallbackError');
       }
     }
+  }
+
+  // Debug methods
+  void debugLog(String message) {
+    print('[DEBUG] $message');
+    if (html.window.location.hostname == 'localhost' ||
+        html.window.location.hostname == '127.0.0.1') {
+      final timestamp = DateTime.now().toIso8601String().substring(11, 19);
+      final logMessage = '[$timestamp] $message\n';
+      debugStatus.text = '${debugStatus.text}$logMessage';
+      debugStatus.scrollTop = debugStatus.scrollHeight;
+    }
+  }
+
+  Future<void> testNotification() async {
+    debugLog('🧪 Testing notification...');
+    updateDebugStatus('Testing notification...', 'info');
+
+    try {
+      // First check permission
+      final permission = html.Notification.permission;
+      debugLog('Current permission: $permission');
+
+      if (permission == 'granted') {
+        await sendNotification();
+        updateDebugStatus('✅ Test notification sent successfully!', 'success');
+      } else if (permission == 'default') {
+        debugLog('Requesting notification permission...');
+        final result = await html.Notification.requestPermission();
+        debugLog('Permission result: $result');
+
+        if (result == 'granted') {
+          await sendNotification();
+          updateDebugStatus(
+              '✅ Permission granted, test notification sent!', 'success');
+        } else {
+          updateDebugStatus(
+              '❌ Permission denied. Cannot send notifications.', 'error');
+        }
+      } else {
+        updateDebugStatus(
+            '❌ Notifications are blocked. Check browser settings.', 'error');
+      }
+    } catch (e) {
+      debugLog('Test notification error: $e');
+      updateDebugStatus('❌ Test notification failed: $e', 'error');
+    }
+  }
+
+  void checkNotificationPermissions() {
+    debugLog('🔍 Checking notification permissions...');
+
+    final info = StringBuffer();
+    info.writeln('=== Notification API Status ===');
+    info.writeln('Supported: ${html.Notification.supported}');
+    info.writeln('Permission: ${html.Notification.permission}');
+    info.writeln('Max Actions: ${html.Notification.maxActions}');
+    info.writeln('');
+    info.writeln('=== Browser Info ===');
+    info.writeln('User Agent: ${html.window.navigator.userAgent}');
+    info.writeln('Location: ${html.window.location.href}');
+    info.writeln('Protocol: ${html.window.location.protocol}');
+    info.writeln('');
+    info.writeln('=== App Settings ===');
+    info.writeln('Notifications Enabled: ${notificationSettings.enabled}');
+    info.writeln('Reminder Times: ${notificationSettings.times}');
+    info.writeln('Active Days: ${notificationSettings.weekdays}');
+
+    updateDebugStatus(info.toString(), 'info');
+  }
+
+  Future<void> checkServiceWorker() async {
+    debugLog('🔍 Checking service worker...');
+
+    final info = StringBuffer();
+    info.writeln('=== Service Worker Status ===');
+
+    try {
+      final serviceWorker = html.window.navigator.serviceWorker;
+      if (serviceWorker == null) {
+        info.writeln('❌ Service Worker API not available');
+      } else {
+        info.writeln('✅ Service Worker API available');
+
+        final registration = await serviceWorker.ready;
+        info.writeln('✅ Service Worker registered');
+        info.writeln('Scope: ${(registration as dynamic).scope}');
+
+        final controller = serviceWorker.controller;
+        if (controller != null) {
+          info.writeln('✅ Service Worker controlling page');
+          info.writeln('State: ${(controller as dynamic).state}');
+        } else {
+          info.writeln('⚠️ No service worker controlling this page');
+        }
+
+        // Test service worker messaging
+        final messageChannel = html.MessageChannel();
+        controller?.postMessage({
+          'type': 'PING',
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+        }, [
+          messageChannel.port2
+        ]);
+
+        messageChannel.port1.onMessage.listen((event) {
+          info.writeln('✅ Service Worker responded to ping');
+          updateDebugStatus(info.toString(), 'success');
+        });
+
+        // Timeout for ping response
+        Timer(Duration(seconds: 2), () {
+          if (!info.toString().contains('responded to ping')) {
+            info.writeln('⚠️ Service Worker ping timeout');
+          }
+          updateDebugStatus(info.toString(), 'warning');
+        });
+      }
+    } catch (e) {
+      info.writeln('❌ Service Worker error: $e');
+      updateDebugStatus(info.toString(), 'error');
+    }
+  }
+
+  void updateDebugStatus(String message, String type) {
+    debugStatus.text = message;
+    debugStatus.className = 'debug-output $type';
+    debugLog('Debug status updated: [$type] $message');
   }
 }
