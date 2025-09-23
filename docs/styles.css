@@ -38,6 +38,34 @@ body {
     opacity: 0.9;
 }
 
+.yoda-quote {
+    font-style: italic;
+    color: #E8F5E8;
+    font-weight: 400;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    transition: opacity 0.5s ease-in-out;
+    cursor: pointer;
+    min-height: 1.8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5px;
+}
+
+.yoda-quote:hover {
+    color: #C8E6C9;
+    transform: scale(1.02);
+    transition: all 0.3s ease;
+}
+
+.yoda-quote.fade-out {
+    opacity: 0;
+}
+
+.yoda-quote.fade-in {
+    opacity: 1;
+}
+
 .main-content {
     flex: 1;
     background: white;

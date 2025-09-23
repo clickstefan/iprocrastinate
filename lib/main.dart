@@ -1,6 +1,8 @@
 import 'dart:html' as html;
+import 'dart:js' as js;
 import 'dart:convert';
 import 'dart:async';
+import 'dart:math';
 
 void main() {
   iProcrastinateApp().init();
@@ -102,6 +104,12 @@ class iProcrastinateApp {
   late html.ButtonElement checkSwBtn;
   late html.Element debugStatus;
 
+  // Quote elements and data
+  late html.Element yodaQuote;
+  List<String> quotes = [];
+  int currentQuoteIndex = 0;
+  Timer? quoteTimer;
+
   void init() {
     // Get DOM elements
     taskCounter = html.querySelector('#taskCounter')!;
@@ -128,6 +136,9 @@ class iProcrastinateApp {
         html.querySelector('#checkPermissionsBtn') as html.ButtonElement;
     checkSwBtn = html.querySelector('#checkSwBtn') as html.ButtonElement;
     debugStatus = html.querySelector('#debugStatus')!;
+
+    // Get quote element
+    yodaQuote = html.querySelector('#yodaQuote')!;
 
     // Show debug section on localhost
     if (html.window.location.hostname == 'localhost' ||
@@ -165,6 +176,9 @@ class iProcrastinateApp {
     checkPermissionsBtn.onClick.listen((_) => checkNotificationPermissions());
     checkSwBtn.onClick.listen((_) => checkServiceWorker());
 
+    // Quote event listeners
+    yodaQuote.onClick.listen((_) => nextQuote());
+
     taskInput.onKeyPress.listen((event) {
       if (event.keyCode == 13) {
         // Enter key
@@ -176,6 +190,9 @@ class iProcrastinateApp {
     loadFromStorage();
     updateUI();
     updateNotificationUI();
+
+    // Load quotes and start rotation
+    loadQuotes();
 
     print('iProcrastinate web app initialized!');
     print('Notification toggle element: ${notificationToggle}');
@@ -700,5 +717,106 @@ class iProcrastinateApp {
     debugStatus.text = message;
     debugStatus.className = 'debug-output $type';
     debugLog('Debug status updated: [$type] $message');
+  }
+
+  // Quote methods
+  void loadQuotes() {
+    try {
+      print('🔍 [QUOTES] Loading Yoda quotes from JavaScript...');
+      html.window.console
+          .log('🔍 [QUOTES] Attempting to load quotes from window.yodaQuotes');
+
+      // Access quotes from the JavaScript global variable
+      final dynamic jsQuotes = js.context['yodaQuotes'];
+
+      if (jsQuotes != null) {
+        quotes = List<String>.from(jsQuotes);
+        print('✅ [QUOTES] Loaded ${quotes.length} Yoda quotes from JavaScript');
+        html.window.console
+            .log('✅ [QUOTES] Successfully loaded ${quotes.length} quotes');
+
+        if (quotes.isNotEmpty) {
+          // Start with a random quote
+          currentQuoteIndex = Random().nextInt(quotes.length);
+          updateQuoteDisplay();
+          print(
+              '🎯 [QUOTES] Starting with quote #$currentQuoteIndex: "${quotes[currentQuoteIndex]}"');
+
+          // Start quote rotation timer (every 30 seconds)
+          quoteTimer = Timer.periodic(Duration(seconds: 30), (_) {
+            print('⏰ [QUOTES] Timer triggered - rotating to next quote');
+            nextQuote();
+          });
+          print(
+              '⏰ [QUOTES] Quote rotation timer started (30 second intervals)');
+        }
+      } else {
+        print('❌ [QUOTES] window.yodaQuotes not found, using fallback quotes');
+        html.window.console
+            .warn('❌ [QUOTES] yoda-quotes.js may not have loaded correctly');
+
+        // Use fallback quotes
+        quotes = [
+          'Procrastinate or procrastinate not, there is no do.',
+          'Strong with the Force you are, but stronger with Netflix you seem to be.',
+          'Tomorrow, better than today it is. Wait you should.',
+          'The Force flows through relaxation, not through endless doing.',
+        ];
+        currentQuoteIndex = Random().nextInt(quotes.length);
+        updateQuoteDisplay();
+        print('🔄 [QUOTES] Using ${quotes.length} fallback quotes');
+      }
+    } catch (e) {
+      print('💥 [QUOTES] Exception loading quotes: $e');
+      html.window.console.error('💥 [QUOTES] Error: $e');
+
+      // Use single fallback quote
+      quotes = [
+        'Strong with the Force you are, but stronger with Netflix you seem to be.'
+      ];
+      currentQuoteIndex = 0;
+      updateQuoteDisplay();
+    }
+  }
+
+  void nextQuote() {
+    if (quotes.isEmpty) {
+      print('⚠️ [QUOTES] Cannot advance quote - no quotes available');
+      return;
+    }
+
+    final oldIndex = currentQuoteIndex;
+    print('🔄 [QUOTES] Advancing from quote #$oldIndex');
+
+    // Add fade-out effect
+    yodaQuote.classes.add('fade-out');
+
+    // Wait for fade-out, then update quote and fade-in
+    Timer(Duration(milliseconds: 250), () {
+      currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+      print('➡️ [QUOTES] Advanced from #$oldIndex to #$currentQuoteIndex');
+      updateQuoteDisplay();
+
+      yodaQuote.classes.remove('fade-out');
+      yodaQuote.classes.add('fade-in');
+
+      // Remove fade-in class after animation
+      Timer(Duration(milliseconds: 500), () {
+        yodaQuote.classes.remove('fade-in');
+        print('✨ [QUOTES] Quote transition complete');
+      });
+    });
+  }
+
+  void updateQuoteDisplay() {
+    if (quotes.isNotEmpty && currentQuoteIndex < quotes.length) {
+      final newQuote = quotes[currentQuoteIndex];
+      yodaQuote.text = newQuote;
+      print('📝 [QUOTES] Quote displayed: "$newQuote"');
+      html.window.console
+          .log('📝 [QUOTES] Updated to quote #$currentQuoteIndex: "$newQuote"');
+    } else {
+      print('⚠️ [QUOTES] Cannot update quote - quotes empty or invalid index');
+    }
   }
 }
