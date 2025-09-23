@@ -38,14 +38,17 @@ jobs:
     - name: Install dependencies
       run: dart pub get
 
+    - name: Install build tools
+      run: sudo apt-get update && sudo apt-get install -y make
+
     - name: Verify formatting
-      run: dart format --output=none --set-exit-if-changed .
+      run: make format
 
     - name: Analyze project source
-      run: dart analyze --fatal-warnings
+      run: make analyze
 
     - name: Run unit tests
-      run: dart test --coverage=coverage
+      run: make test
 
     - name: Install jq for manifest validation
       run: sudo apt-get update && sudo apt-get install -y jq
@@ -84,13 +87,13 @@ jobs:
     - name: Install dependencies
       run: dart pub get
 
-    - name: Create output directory
-      run: mkdir -p ${{ env.OUTPUT_DIR }}
+    - name: Install build tools
+      run: sudo apt-get update && sudo apt-get install -y make
 
-    - name: Build optimized JavaScript
+    - name: Build with Makefile
       run: |
-        echo "Building optimized JavaScript for production..."
-        dart compile js -O2 lib/main.dart -o ${{ env.OUTPUT_DIR }}/main.dart.js
+        echo "Building with Makefile..."
+        make build
 
     - name: Copy static assets
       run: |
@@ -176,16 +179,13 @@ jobs:
     - name: Install dependencies
       run: dart pub get
 
+    - name: Install build tools
+      run: sudo apt-get update && sudo apt-get install -y make
+
     - name: Build for GitHub Pages
       run: |
-        # Ensure we're building to the correct directory
-        mkdir -p ${{ env.OUTPUT_DIR }}
-        dart compile js -O2 lib/main.dart -o ${{ env.OUTPUT_DIR }}/main.dart.js
-
-        # Copy static assets if they don't exist in target directory
-        if [ -f "web/index.html" ] && [ "${{ env.OUTPUT_DIR }}" != "web" ]; then
-          cp web/*.{html,css,json,png,ico,svg} ${{ env.OUTPUT_DIR }}/ 2>/dev/null || true
-        fi
+        echo "Building for GitHub Pages with Makefile..."
+        make build
 
     - name: Setup Pages
       uses: actions/configure-pages@v3
@@ -217,6 +217,9 @@ jobs:
     - name: Install dependencies
       run: dart pub get
 
+    - name: Install build tools
+      run: sudo apt-get update && sudo apt-get install -y make
+
     - name: Security audit
       run: |
         echo "🔒 Running security audit..."
@@ -227,9 +230,9 @@ jobs:
       run: |
         echo "⚡ Performance analysis..."
         # Build and check sizes
-        dart compile js -O2 lib/main.dart -o ${{ env.OUTPUT_DIR }}/main.dart.js
+        make build
 
-        js_size=$(wc -c < "${{ env.OUTPUT_DIR }}/main.dart.js")
+        js_size=$(wc -c < "docs/main.dart.js")
         js_size_kb=$((js_size / 1024))
 
         echo "📊 Bundle Analysis:"

@@ -89,10 +89,10 @@ echo "🎨 Step 3: Code Formatting"
 echo "--------------------------"
 
 # Check if code is properly formatted
-if dart format --output=none --set-exit-if-changed . >/dev/null 2>&1; then
+if make format >/dev/null 2>&1; then
     print_status "success" "Code is properly formatted"
 else
-    print_status "error" "Code formatting issues found. Run 'dart format .' to fix"
+    print_status "error" "Code formatting issues found. Run 'make format-fix' to fix"
     echo ""
     print_status "info" "Files that need formatting:"
     dart format --output=none --set-exit-if-changed . 2>&1 | grep "^Changed" || true
@@ -106,14 +106,11 @@ echo "🔍 Step 4: Static Analysis"
 echo "--------------------------"
 
 # Run analysis with same settings as CI
-analysis_output=$(dart analyze --fatal-warnings 2>&1)
-analysis_status=$?
-
-if [ $analysis_status -eq 0 ]; then
+if make analyze >/dev/null 2>&1; then
     print_status "success" "Static analysis passed"
 else
     print_status "error" "Static analysis found issues:"
-    echo "$analysis_output" | grep -E "(error|warning|info)" | head -10
+    make analyze 2>&1 | grep -E "(error|warning|info)" | head -10
     overall_status=1
 fi
 
@@ -123,10 +120,10 @@ echo ""
 echo "🧪 Step 5: Test Execution"
 echo "-------------------------"
 
-if run_check "Unit tests" "dart test" "Unit tests failed"; then
+if run_check "Unit tests" "make test" "Unit tests failed"; then
     print_status "success" "All unit tests passed"
 else
-    print_status "error" "Run 'dart test' to see test failures"
+    print_status "error" "Run 'make test' to see test failures"
     overall_status=1
 fi
 
@@ -154,9 +151,8 @@ echo "🏗️  Step 7: Build Validation"
 echo "----------------------------"
 
 # Test if the build works
-if run_check "JavaScript compilation" "dart compile js lib/main.dart -o .test_build.js" "Build compilation failed"; then
+if run_check "JavaScript compilation" "make build" "Build compilation failed"; then
     print_status "success" "Build compiles successfully"
-    rm -f .test_build.js .test_build.js.deps .test_build.js.map 2>/dev/null
 else
     print_status "error" "Build would fail in CI"
     overall_status=1
@@ -208,10 +204,10 @@ else
     print_status "error" "Some checks failed! ⚠️  Fix issues before committing"
     echo ""
     print_status "info" "Common fixes:"
-    echo "   • dart format .              # Fix formatting"
+    echo "   • make format-fix            # Fix formatting"
     echo "   • dart pub get               # Fix dependencies"
-    echo "   • dart analyze               # See analysis issues"
-    echo "   • dart test                  # Run failing tests"
+    echo "   • make analyze               # See analysis issues"
+    echo "   • make test                  # Run failing tests"
     echo ""
     exit 1
 fi

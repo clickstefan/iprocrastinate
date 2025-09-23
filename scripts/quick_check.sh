@@ -43,29 +43,28 @@ fi
 # 2. Code Formatting (second most common)
 echo ""
 echo "🎨 Formatting"
-if dart format --output=none --set-exit-if-changed . >/dev/null 2>&1; then
+if make format >/dev/null 2>&1; then
     echo -e "   ${GREEN}✅ Code properly formatted${NC}"
 else
-    echo -e "   ${RED}❌ Formatting issues - run 'dart format .' to fix${NC}"
+    echo -e "   ${RED}❌ Formatting issues - run 'make format' to fix${NC}"
     quick_status=1
 fi
 
 # 3. Basic Analysis (catches most syntax errors)
 echo ""
 echo "🔍 Analysis"
-if quick_check "dart analyze" "dart analyze --fatal-warnings"; then
+if quick_check "make analyze" "make analyze"; then
     echo -e "   ${GREEN}Static analysis passed${NC}"
 else
-    echo -e "   ${RED}Analysis issues - run 'dart analyze' for details${NC}"
+    echo -e "   ${RED}Analysis issues - run 'make analyze' for details${NC}"
     quick_status=1
 fi
 
 # 4. Build Test (catches compilation errors)
 echo ""
 echo "🏗️  Build"
-if quick_check "test compile" "dart compile js lib/main.dart -o .quick_test_build.js"; then
+if quick_check "make build" "make build"; then
     echo -e "   ${GREEN}Code compiles successfully${NC}"
-    rm -f .quick_test_build.js* 2>/dev/null
 else
     echo -e "   ${RED}Compilation errors found${NC}"
     quick_status=1
@@ -89,8 +88,8 @@ else
     echo ""
     echo "🔧 Quick fixes:"
     echo "   dart pub get      # Fix dependencies"
-    echo "   dart format .     # Fix formatting"
-    echo "   dart analyze      # See analysis issues"
+    echo "   make format       # Fix formatting"
+    echo "   make analyze      # See analysis issues"
     echo ""
     echo "📋 For detailed diagnostics:"
     echo "   ./scripts/pre_commit_check.sh"

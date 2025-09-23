@@ -57,7 +57,7 @@ simulate_job() {
                 fi
                 ;;
             "Verify formatting")
-                if dart format --output=none --set-exit-if-changed . >/dev/null 2>&1; then
+                if make format >/dev/null 2>&1; then
                     echo -e "${GREEN}✅${NC}"
                 else
                     echo -e "${RED}❌ Code formatting issues${NC}"
@@ -65,7 +65,7 @@ simulate_job() {
                 fi
                 ;;
             "Analyze project source")
-                if dart analyze --fatal-warnings >/dev/null 2>&1; then
+                if make analyze >/dev/null 2>&1; then
                     echo -e "${GREEN}✅${NC}"
                 else
                     echo -e "${RED}❌ Analysis issues${NC}"
@@ -73,7 +73,7 @@ simulate_job() {
                 fi
                 ;;
             "Run unit tests")
-                if dart test >/dev/null 2>&1; then
+                if make test >/dev/null 2>&1; then
                     echo -e "${GREEN}✅${NC}"
                 else
                     echo -e "${RED}❌ Test failures${NC}"
@@ -89,7 +89,7 @@ simulate_job() {
                 fi
                 ;;
             "Build optimized JavaScript")
-                if dart compile js -O2 lib/main.dart -o .ci_test_build.js >/dev/null 2>&1; then
+                if make build >/dev/null 2>&1; then
                     echo -e "${GREEN}✅${NC}"
                     rm -f .ci_test_build.js* 2>/dev/null
                 else
@@ -132,11 +132,10 @@ simulate_job() {
                 fi
                 ;;
             "Performance check")
-                # Build temporarily for size check
-                if dart compile js -O2 lib/main.dart -o .perf_test_build.js >/dev/null 2>&1; then
-                    local js_size=$(wc -c < .perf_test_build.js)
+                # Build for size check
+                if make build >/dev/null 2>&1; then
+                    local js_size=$(wc -c < docs/main.dart.js)
                     local js_size_kb=$((js_size / 1024))
-                    rm -f .perf_test_build.js* 2>/dev/null
 
                     if [ $js_size -lt 500000 ]; then
                         echo -e "${GREEN}✅ (${js_size_kb}KB)${NC}"

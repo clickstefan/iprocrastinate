@@ -47,3 +47,7 @@ app.*.map.json
 docs/main.dart.js
 docs/main.dart.js.map
 docs/main.dart.js.deps
+
+# Development web directory (used by build_runner serve)
+web/
+.dev-server.log
